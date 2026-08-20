@@ -1,0 +1,58 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "agent-mailbox",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-11",
+  "compatibility_flags": ["nodejs_compat"],
+  // Replace these example domains before deploying. Keep the inbound address
+  // local-part as "inbox" unless you also update src/service.ts.
+  "addresses": ["inbox@mail.example.com"],
+  "workers_dev": true,
+  "routes": [
+    {
+      "pattern": "mailbox.example.com",
+      "custom_domain": true,
+    },
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "MAILBOXES",
+        "class_name": "Mailbox",
+      },
+    ],
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["Mailbox"],
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "ATTACHMENTS",
+    },
+  ],
+  "send_email": [
+    {
+      "name": "EMAIL",
+    },
+  ],
+  "vars": {
+    "EMAIL_DOMAIN": "mail.example.com",
+    "MCP_HOSTNAME": "mailbox.example.com",
+    "DEFAULT_MAILBOX_TTL_SECONDS": "86400",
+    "MAX_MAILBOX_TTL_SECONDS": "604800",
+    "MAX_OUTBOUND_PER_DAY": "20",
+  },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "head_sampling_rate": 1,
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.1,
+    },
+  },
+}

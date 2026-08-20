@@ -1,0 +1,2 @@
+# Copy this file to .dev.vars for local development and replace the value.
+AGENT_API_KEY=replace-with-a-random-secret

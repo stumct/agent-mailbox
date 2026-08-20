@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agent Mailbox"
+  short_description: "Use disposable mailboxes in automated flows"
+  default_prompt: "Use $agent-mailbox to create a short-lived inbox and complete this email verification flow."

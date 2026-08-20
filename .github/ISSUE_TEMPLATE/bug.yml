@@ -1,0 +1,56 @@
+name: Bug report
+description: Report a reproducible problem without sharing private deployment data.
+title: "Bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include API keys, mailbox tokens, email contents, account IDs, or private domains.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Package version, Git tag, or commit.
+    validations:
+      required: true
+  - type: dropdown
+    id: command
+    attributes:
+      label: Area
+      options:
+        - Deployment setup
+        - Deployment management
+        - MCP client connection
+        - Receiving email
+        - Sending email
+        - API or MCP tools
+        - Documentation
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Minimal steps using placeholder domains and redacted output.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Redact Cloudflare account details, paths, and credentials.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: I removed credentials, mailbox data, account identifiers, and private domains.
+          required: true

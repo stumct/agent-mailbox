@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Optional stdio bridge for MCP clients that cannot connect to Streamable HTTP.
+# The API key stays out of command arguments and checked-in client configuration.
+connector_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+credentials_file="$connector_dir/../.agent-mailbox.credentials.json"
+
+generated_url=""
+generated_key=""
+if [[ (-z "${AGENT_MAILBOX_MCP_URL:-}" || -z "${AGENT_MAILBOX_API_KEY:-}") && -f "$credentials_file" ]]; then
+  if ! generated_credentials="$(node --input-type=module -e '
+    import { readFile } from "node:fs/promises";
+    const credentials = JSON.parse(await readFile(process.argv[1], "utf8"));
+    const url = typeof credentials.mcpUrl === "string" ? credentials.mcpUrl : "";
+    const key = typeof credentials.apiKey === "string" ? credentials.apiKey : "";
+    console.log(`${url}\t${key}`);
+  ' "$credentials_file")"; then
+    echo "agent-mailbox: could not read $credentials_file" >&2
+    exit 1
+  fi
+  IFS=$'\t' read -r generated_url generated_key <<< "$generated_credentials"
+fi
+
+mailbox_url="${AGENT_MAILBOX_MCP_URL:-}"
+if [[ -z "$mailbox_url" ]]; then
+  mailbox_url="$generated_url"
+fi
+
+mailbox_key="${AGENT_MAILBOX_API_KEY:-}"
+if [[ -z "$mailbox_key" ]]; then
+  mailbox_key="$generated_key"
+fi
+if [[ -z "$mailbox_key" ]]; then
+  if ! command -v secret-tool >/dev/null 2>&1; then
+    echo "agent-mailbox: set AGENT_MAILBOX_API_KEY or install secret-tool" >&2
+    exit 1
+  fi
+
+  # Graphical Linux clients may not inherit the Secret Service bus variables.
+  user_id="$(id -u)"
+  export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$user_id}"
+  export DBUS_SESSION_BUS_ADDRESS="${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}"
+
+  keyring_service="${AGENT_MAILBOX_KEYRING_SERVICE:-agent-mailbox}"
+  keyring_account="${AGENT_MAILBOX_KEYRING_ACCOUNT:-agent-mailbox}"
+  mailbox_key="$(secret-tool lookup service "$keyring_service" account "$keyring_account" 2>/dev/null || true)"
+fi
+
+if [[ -z "$mailbox_key" ]]; then
+  echo "agent-mailbox: API key not found in the setup credentials, environment, or Secret Service" >&2
+  exit 1
+fi
+
+if [[ -z "$mailbox_url" ]]; then
+  echo "agent-mailbox: MCP URL not found in the setup credentials or AGENT_MAILBOX_MCP_URL" >&2
+  exit 1
+fi
+
+export AGENT_MAILBOX_AUTHORIZATION="Bearer $mailbox_key"
+unset mailbox_key
+unset generated_key generated_credentials
+
+mcp_remote="$connector_dir/../node_modules/.bin/mcp-remote"
+if [[ ! -x "$mcp_remote" ]]; then
+  echo "agent-mailbox: install the project dependencies before starting the stdio bridge" >&2
+  exit 1
+fi
+
+exec "$mcp_remote" \
+  "$mailbox_url" \
+  --header 'Authorization:${AGENT_MAILBOX_AUTHORIZATION}'

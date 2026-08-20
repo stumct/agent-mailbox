@@ -1,0 +1,61 @@
+{
+  "name": "agent-mailbox",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Disposable, token-scoped email mailboxes for automated testing and AI agents.",
+  "homepage": "https://github.com/stumct/agent-mailbox#readme",
+  "bugs": {
+    "url": "https://github.com/stumct/agent-mailbox/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stumct/agent-mailbox.git"
+  },
+  "type": "module",
+  "scripts": {
+    "check": "node --run format:check && node --run lint && node --run typecheck && node --run test && node --run package:check && node --run deploy:dry-run",
+    "connect": "node scripts/agent-mailbox.ts connect",
+    "deploy": "wrangler deploy",
+    "deploy:dry-run": "wrangler deploy --dry-run",
+    "dev": "wrangler dev",
+    "disconnect": "node scripts/agent-mailbox.ts disconnect",
+    "doctor": "node scripts/agent-mailbox.ts doctor",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "lint": "oxlint --type-aware --deny-warnings .",
+    "list": "node scripts/agent-mailbox.ts list",
+    "mailbox": "node scripts/agent-mailbox.ts",
+    "package:check": "pnpm --filter create-agent-mailbox check && node scripts/verify-package.ts",
+    "purge-data": "node scripts/agent-mailbox.ts purge-data",
+    "setup": "node scripts/agent-mailbox.ts deploy",
+    "teardown": "node scripts/agent-mailbox.ts teardown",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "wrangler types --check && tsc --noEmit && tsc --noEmit -p test/tsconfig.json"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "2.0.0",
+    "agents": "0.20.1",
+    "mcp-remote": "0.1.38",
+    "postal-mime": "3.0.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@clack/prompts": "1.7.0",
+    "@cloudflare/vitest-pool-workers": "0.21.3",
+    "@types/node": "24.13.3",
+    "jsonc-parser": "3.3.1",
+    "oxfmt": "0.64.0",
+    "oxlint": "1.79.0",
+    "oxlint-tsgolint": "7.0.2001",
+    "typescript": "7.0.2",
+    "vite": "^8.0.0",
+    "vitest": "^4.1.0",
+    "wrangler": "4.121.0"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@10.33.0"
+}

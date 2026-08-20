@@ -1,0 +1,52 @@
+{
+  "name": "create-agent-mailbox",
+  "version": "0.1.0",
+  "description": "Create and deploy a self-hosted Agent Mailbox on Cloudflare.",
+  "keywords": [
+    "cloudflare",
+    "disposable-email",
+    "email-testing",
+    "mcp",
+    "testing"
+  ],
+  "homepage": "https://github.com/stumct/agent-mailbox#readme",
+  "bugs": {
+    "url": "https://github.com/stumct/agent-mailbox/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stumct/agent-mailbox.git",
+    "directory": "packages/create-agent-mailbox"
+  },
+  "bin": {
+    "create-agent-mailbox": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "type": "module",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "check": "npm run build && node dist/validate-package.js && node dist/index.js --help",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run build && node dist/validate-package.js"
+  },
+  "dependencies": {
+    "@clack/prompts": "1.7.0",
+    "tar": "7.5.22"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}
