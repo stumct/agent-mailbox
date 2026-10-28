@@ -38,7 +38,7 @@
     "@modelcontextprotocol/server": "2.0.0",
     "agents": "0.20.1",
     "mcp-remote": "0.1.38",
-    "postal-mime": "3.0.0",
+    "postal-mime": "4.0.8",
     "zod": "4.4.3"
   },
   "devDependencies": {
